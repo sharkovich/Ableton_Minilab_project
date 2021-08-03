@@ -184,7 +184,7 @@ class SessionComponent(SessionComponentBase):
                 slot = scene.clip_slot(x)
                 slot.set_led(led)
         else:
-            for x, y in product(xrange(self._num_tracks), xrange(self._num_scenes)):
+            for x, y in product(range(self._num_tracks), range(self._num_scenes)):
                 scene = self.scene(y)
                 slot = scene.clip_slot(x)
                 slot.set_led(None)

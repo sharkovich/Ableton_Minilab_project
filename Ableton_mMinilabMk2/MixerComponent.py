@@ -33,9 +33,8 @@ class MixerComponent(MixerComponentBase):
         self.selected_strip().set_mute_button(button)
 
     def set_return_volume_controls(self, controls):
-        for strip, control in map(None, self._return_strips, controls or []):
-            strip.set_volume_control(control)
-    
+        list(map(lambda strip, control: strip.set_volume_control(control), self._return_strips, controls or []))
+
     def set_track_select_encoder(self, encoder):
         self._track_selection.set_scroll_encoder(encoder)
 

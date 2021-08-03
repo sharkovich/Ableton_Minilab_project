@@ -4,7 +4,6 @@ from __future__ import absolute_import, print_function, unicode_literals
 import time
 import logging
 from functools import partial
-from itertools import izip
 from itertools import cycle
 from .Constants import *
 
@@ -74,7 +73,7 @@ los clips en modo sesion se puedan parar'''
 ANALOG_LAB_MEMORY_SLOT_ID = 1
 LIVE_MEMORY_SLOT_ID = 8
 HARDWARE_ENCODER_IDS = (48, 1, 2, 9, 11, 12, 13, 14, 51, 3, 4, 10, 5, 6, 7, 8)
-HARDWARE_BUTTON_IDS = xrange(112, 128)  #
+HARDWARE_BUTTON_IDS = range(112, 128)  #
 PAD_IDENTIFIER_OFFSET = 36
 ENCODER_PUSH1 = 113
 ENCODER_PUSH1_ALT = 112
@@ -226,14 +225,14 @@ class mMiniLabMk2(ArturiaControlSurface):
                 [ButtonElement(
                     True, MIDI_NOTE_TYPE, self.pad_channel, col + 36 + 8 * row, name=u'Pad_%d_%d' % (col, row)
                 )
-                    for col in xrange(8)] for row in xrange(1)]
+                    for col in range(8)] for row in range(1)]
         )
         self._pads2 = ButtonMatrixElement(
             rows=[
                 [ButtonElement(
                     True, MIDI_NOTE_TYPE, self.pad_channel, col + 36 + 8 * row, name=u'Pad_%d_%d' % (col, row)
                 )
-                    for col in xrange(8)] for row in xrange(2)]
+                    for col in range(8)] for row in range(2)]
         )
 
         self._pad_leds = ButtonMatrixElement(
@@ -242,7 +241,7 @@ class mMiniLabMk2(ArturiaControlSurface):
                     WRITE_COMMAND, WORKING_MEMORY_ID, COLOR_PROPERTY, column + 112 + row * 8), default_value=(0,),
                 name=u'Pad_LED_%d' % (column,)
             ) for column in
-                xrange(8)] for row in xrange(1)], name=u'Pad_LED_Matrix'
+                range(8)] for row in range(1)], name=u'Pad_LED_Matrix'
         )
 
         self._knob8_button = ButtonElement(True, MIDI_CC_TYPE, self.button_encoder_msg_channel, ENCODER_PUSH2,
@@ -364,7 +363,7 @@ class mMiniLabMk2(ArturiaControlSurface):
             self._mixer.set_return_volume_controls(self._return_encoders)
 
     def _collect_setup_messages(self):
-        for cc_id, encoder_id in izip(self.encoder_msg_ids, HARDWARE_ENCODER_IDS):
+        for cc_id, encoder_id in zip(self.encoder_msg_ids, HARDWARE_ENCODER_IDS):
             # logger.info("encoder - cc_id :: " + str(cc_id) + " id :: " + str(encoder_id) + " channel :: " + str(self.encoder_msg_channel))
             self._setup_hardware_encoder(encoder_id, cc_id, channel=self.encoder_msg_channel)
 
