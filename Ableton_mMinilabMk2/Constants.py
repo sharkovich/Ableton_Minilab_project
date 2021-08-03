@@ -19,7 +19,7 @@ WHITE = 127  # - blanco
 EMPTY_VALUE = BLACK  # - apagado
 SELECTED_VALUE = WHITE  # - blanco
 
-STOPPED_VALUE = YELLOW  # - yellow
+STOPPED_VALUE = WHITE  # - yellow
 
 STARTED_VALUE = GREEN  # - green
 TRIGGERED_TO_PLAY_VALUE = GREEN  # - green
