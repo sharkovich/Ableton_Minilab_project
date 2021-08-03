@@ -863,80 +863,89 @@ class mMiniLabMk2(ArturiaControlSurface):
         relevant_track = total_v_tracks[track_number]
         # logger.info("_pads_n" + str(pad_id) + " : session track name: " + str(relevant_track.name))
         return relevant_track
-    
+
+    def _toggle_pad_arm(self, pad_id, track):
+        track.arm = not track.arm
+        _send_color(self, 112 + pad_id, RED if track.arm else EMPTY_VALUE)
+
+    def _toggle_pad_mute(self, pad_id, track):
+        track.mute = not track.mute
+        _send_color(self, 112 + pad_id, TRACK_MUTED_VALUE if track.mute else EMPTY_VALUE)
+
     def _pads_n0(self, value):
         pad_id = 0
         # logger.info("_pads_n" + str(pad_id) + " : value: " + str(value))
         relevant_track = self.get_session_track(pad_id)
         if value > 0:
             if self.enc8_button and relevant_track.can_be_armed:
-                relevant_track.arm = not relevant_track.arm
+                self._toggle_pad_arm(pad_id, relevant_track)
             if self.enc0_button:
-                relevant_track.mute = not relevant_track.mute
-    
+                self._toggle_pad_mute(pad_id, relevant_track)
+
     def _pads_n1(self, value):
         pad_id = 1
         relevant_track = self.get_session_track(pad_id)
         if value > 0:
             if self.enc8_button and relevant_track.can_be_armed:
-                relevant_track.arm = not relevant_track.arm
+                self._toggle_pad_arm(pad_id, relevant_track)
             if self.enc0_button:
-                relevant_track.mute = not relevant_track.mute
-    
+                self._toggle_pad_mute(pad_id, relevant_track)
+
     def _pads_n2(self, value):
         pad_id = 2
         relevant_track = self.get_session_track(pad_id)
         if value > 0:
             if self.enc8_button and relevant_track.can_be_armed:
-                relevant_track.arm = not relevant_track.arm
+                self._toggle_pad_arm(pad_id, relevant_track)
             if self.enc0_button:
-                relevant_track.mute = not relevant_track.mute
-    
+                self._toggle_pad_mute(pad_id, relevant_track)
+
     def _pads_n3(self, value):
         pad_id = 3
         relevant_track = self.get_session_track(pad_id)
         if value > 0:
             if self.enc8_button and relevant_track.can_be_armed:
-                relevant_track.arm = not relevant_track.arm
+                self._toggle_pad_arm(pad_id, relevant_track)
             if self.enc0_button:
-                relevant_track.mute = not relevant_track.mute
-    
+                self._toggle_pad_mute(pad_id, relevant_track)
+
     def _pads_n4(self, value):
         pad_id = 4
         relevant_track = self.get_session_track(pad_id)
         if value > 0:
             if self.enc8_button and relevant_track.can_be_armed:
-                relevant_track.arm = not relevant_track.arm
+                self._toggle_pad_arm(pad_id, relevant_track)
             if self.enc0_button:
-                relevant_track.mute = not relevant_track.mute
-    
+                self._toggle_pad_mute(pad_id, relevant_track)
+
     def _pads_n5(self, value):
         pad_id = 5
         relevant_track = self.get_session_track(pad_id)
         if value > 0:
             if self.enc8_button and relevant_track.can_be_armed:
-                relevant_track.arm = not relevant_track.arm
+                self._toggle_pad_arm(pad_id, relevant_track)
             if self.enc0_button:
-                relevant_track.mute = not relevant_track.mute
-    
+                self._toggle_pad_mute(pad_id, relevant_track)
+
+
     def _pads_n6(self, value):
         pad_id = 6
         relevant_track = self.get_session_track(pad_id)
         if value > 0:
             if self.enc8_button and relevant_track.can_be_armed:
-                relevant_track.arm = not relevant_track.arm
+                self._toggle_pad_arm(pad_id, relevant_track)
             if self.enc0_button:
-                relevant_track.mute = not relevant_track.mute
-    
+                self._toggle_pad_mute(pad_id, relevant_track)
+
     def _pads_n7(self, value):
         pad_id = 7
         relevant_track = self.get_session_track(pad_id)
         if value > 0:
             if self.enc8_button and relevant_track.can_be_armed:
-                relevant_track.arm = not relevant_track.arm
+                self._toggle_pad_arm(pad_id, relevant_track)
             if self.enc0_button:
-                relevant_track.mute = not relevant_track.mute
-    
+                self._toggle_pad_mute(pad_id, relevant_track)
+
     # ? PADS 2
     # * n120 - play button / arm track and overdub
     def _pads2_n8(self, value):
