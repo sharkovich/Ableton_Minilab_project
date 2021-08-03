@@ -2,6 +2,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import time
 from itertools import cycle
 import logging
+
 logger = logging.getLogger(__name__)
 
 from Ableton_mMinilabMk2.Constants import BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE
@@ -11,16 +12,16 @@ PADS = [112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 12
 DEFAULT_BLINK = 1
 
 
-
 def blink_conditioned(self, condition=lambda: False, pad_number=120, colors=[RED, BLACK], timeout=3):
     c = cycle(colors)
+
     def callback():
         if condition():
             _send_color(self, pad_number, next(c))
             self.schedule_message(timeout, callback)
         else:
             _send_color(self, pad_number, BLACK)
-    
+
     # give the condition some time (1 tick) to fulfil itself
     self.schedule_message(1, callback)
 
@@ -31,7 +32,7 @@ def _send_color(self, pad_number, color):
 
 
 def _shift_led(self, mode=False):
-    if mode == True:
+    if mode:
         self._send_midi((240, 0, 32, 107, 127, 66, 2, 0, 16, 46, 127, 247))
     else:
         self._send_midi((240, 0, 32, 107, 127, 66, 2, 0, 16, 46, 0, 247))
@@ -64,12 +65,12 @@ def _leds_NormalMode(self, song_instance):
         else:
             _send_color(self, 121, BLUE)
             _send_color(self, 120, WHITE)
-    
+
     if song_instance.overdub:
         _send_color(self, 122, RED)
     else:
         _send_color(self, 122, MAGENTA)
-    
+
     # undo
     _send_color(self, 123, CYAN)
     # * alternate detail view
@@ -78,7 +79,7 @@ def _leds_NormalMode(self, song_instance):
     # self._blink(True, 125, timeout=5, colors=[0, 20])
     # new scene
     _send_color(self, 126, RED)
-    
+
     scene_selected = song_instance.view.selected_scene
     if scene_selected.is_empty:
         _send_color(self, 127, BLACK)
@@ -111,7 +112,7 @@ def _leds_ClipMode(self, song_instance):
         _send_color(self, 125, BLACK)
         _send_color(self, 126, BLACK)
         _send_color(self, 127, BLACK)
-    
+
     else:
         if not clip.is_playing:
             # * scrub

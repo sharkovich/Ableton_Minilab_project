@@ -1,3 +1,4 @@
+
 # Embedded file name: /Users/versonator/Jenkins/live/output/Live/mac_64_static/Release/python-bundle/MIDI Remote Scripts/MiniLab_mkII/MiniLabMk2.py
 from __future__ import absolute_import, print_function, unicode_literals
 import time
@@ -27,7 +28,8 @@ from _Framework.TransportComponent import TransportComponent
 from .HardwareSettingsComponent import HardwareSettingsComponent
 from .MixerComponent import MixerComponent
 from .SessionComponent import SessionComponent
-from .LedUtils import _off_leds, _shift_led, _leds_NormalMode, _leds_ClipMode, blink_conditioned, _color_leds, _send_color
+from .LedUtils import _off_leds, _shift_led, _leds_NormalMode, _leds_ClipMode, blink_conditioned, _color_leds, \
+    _send_color
 from .Actions import Actions
 
 '''En modo live, los 8 primeros pads actuan en modo sesion
@@ -88,23 +90,23 @@ SWITCHPAD_BUTTON_MSG = SETUP_MSG_PREFIX + (
 
 NORMAL_MIDIMAPMODE = Live.MidiMap.MapMode.relative_smooth_two_compliment
 
-TWO_SENDS = False
+TWO_SENDS = True
 
 
 class mMiniLabMk2(ArturiaControlSurface):
     session_component_type = SessionComponent
-    
+
     encoder_msg_channel = 0
     # button_encoder_msg_channel = 9 en el preset pero se cambia, en este caso a 2
     button_encoder_msg_channel = 2
     alt_button_encoder_msg_channel = 2
     encoder_msg_ids = (7, 74, 71, 76, 77, 93, 73, 75, 114, 18, 19, 16, 17, 91, 79, 72)  # Analog Lab defaults
     pad_channel = 10
-    
+
     def __init__(self, *a, **k):
-        
+
         super(mMiniLabMk2, self).__init__(*a, **k)
-        
+
         with self.component_guard():
             self.live_mode = False
             self.shift_active = False
@@ -128,9 +130,9 @@ class mMiniLabMk2(ArturiaControlSurface):
 
             _off_leds(self)
             self.show_message("mMiniLabMk2 Listo...!")
-    
+
     def _create_controls(self):
-        
+
         self._knob0_encoder = EncoderElement(
             MIDI_CC_TYPE, self.encoder_msg_channel,
             self.encoder_msg_ids[0],
@@ -142,7 +144,7 @@ class mMiniLabMk2(ArturiaControlSurface):
             NORMAL_MIDIMAPMODE,
             name=u'Vertical_Scroll_Encoder'
         )
-        
+
         self._device_controls = ButtonMatrixElement(
             rows=[[EncoderElement(
                 MIDI_CC_TYPE, self.encoder_msg_channel,
@@ -168,7 +170,7 @@ class mMiniLabMk2(ArturiaControlSurface):
                 name=u'Send_B_Encoder'
             )
             self._send_encoders = ButtonMatrixElement(rows=[[self._knob6_encoder, self._knob14_encoder]])
-            
+
             # volumenes de los send tracks
             self._knob7_encoder = EncoderElement(
                 MIDI_CC_TYPE, self.encoder_msg_channel, self.encoder_msg_ids[6],
@@ -207,18 +209,18 @@ class mMiniLabMk2(ArturiaControlSurface):
             self._send_encoders = ButtonMatrixElement(
                 rows=[[self._knob6_encoder, self._knob7_encoder, self._knob14_encoder, self._knob15_encoder]]
             )
-        
+
         self._pan_encoder = EncoderElement(
             MIDI_CC_TYPE, self.encoder_msg_channel, self.encoder_msg_ids[7],
             NORMAL_MIDIMAPMODE, name=u'Pan_Encoder'
         )
-        
+
         self._volume_encoder = EncoderElement(
             MIDI_CC_TYPE, self.encoder_msg_channel, self.encoder_msg_ids[15],
             NORMAL_MIDIMAPMODE,
             name=u'Volume_Encoder'
         )
-        
+
         self._pads = ButtonMatrixElement(
             rows=[
                 [ButtonElement(
@@ -233,8 +235,7 @@ class mMiniLabMk2(ArturiaControlSurface):
                 )
                     for col in xrange(8)] for row in xrange(2)]
         )
-        
-        
+
         self._pad_leds = ButtonMatrixElement(
             rows=[[SysexValueControl(
                 message_prefix=SETUP_MSG_PREFIX + (
@@ -243,29 +244,29 @@ class mMiniLabMk2(ArturiaControlSurface):
             ) for column in
                 xrange(8)] for row in xrange(1)], name=u'Pad_LED_Matrix'
         )
-        
+
         self._knob8_button = ButtonElement(True, MIDI_CC_TYPE, self.button_encoder_msg_channel, ENCODER_PUSH2,
-                                         name='Arm_Button'
-                                         )
+                                           name='Arm_Button'
+                                           )
         self._knob0_button = ButtonElement(
             True, MIDI_CC_TYPE, self.button_encoder_msg_channel, ENCODER_PUSH1,
             name='Change_Focus_Button'
         )
-        
+
         # Inconsistente en el canal, Bug en MCC?
         #         self._alt_encoder0 = EncoderElement(MIDI_CC_TYPE, self.alt_button_encoder_msg_channel, 112, Live.MidiMap.MapMode.relative_smooth_two_compliment, name=u'Alternative_Encoder0')
         #         self._alt_encoder8 = EncoderElement(MIDI_CC_TYPE, self.alt_button_encoder_msg_channel, 116, Live.MidiMap.MapMode.relative_smooth_two_compliment, name=u'Alternative_Encoder9')
-        
+
         '''
          In:  B0  07  00  |  Ch 1 CC 7 - Channel Volume
          In:  B2  07  02  |  Ch 3 CC 7 - Channel Volume
          In:  B0  72  00  |  Ch 1 CC 114 - Undefined
          In:  B2  74  0C  |  Ch 3 CC 116 - Undefined
         '''
-        
+
         self._switchpad_button = SysexValueControl(SWITCHPAD_BUTTON_MSG, name='Pad_Selection_button')
         self._shift_button = SysexValueControl(SHIFT_BUTTON_MSG, name=u'Shift_button_pressed')
-        
+
         self._memory_slot_selection = SysexValueControl(
             message_prefix=SETUP_MSG_PREFIX + (MEMORY_SLOT_PROPERTY,),
             name=u'Memory_Slot_Selection'
@@ -275,11 +276,9 @@ class mMiniLabMk2(ArturiaControlSurface):
             default_value=(OFF_VALUE,),
             name=u'Hardware_Live_Mode_Switch'
         )
-    
-    
-    
+
     # region ::: region Create
-    
+
     def _create_hardware_settings(self):
         self._hardware_settings = HardwareSettingsComponent(
             name=u'Hardware_Settings', is_enabled=False, layer=Layer(
@@ -289,12 +288,12 @@ class mMiniLabMk2(ArturiaControlSurface):
         )
         self._on_live_mode_changed.subject = self._hardware_settings
         self._hardware_settings.set_enabled(True)
-    
+
     # TODO: Hacer un modo de solo mezcla en otra memoria
     @subject_slot(u'live_mode')
     def _on_live_mode_changed(self, is_live_mode_on):
         _off_leds(self)
-        
+
         self._transport.set_enabled(is_live_mode_on)
         self._session.set_enabled(is_live_mode_on)
         self._mixer.set_enabled(is_live_mode_on)
@@ -311,7 +310,7 @@ class mMiniLabMk2(ArturiaControlSurface):
             self.live_mode = False
             _off_leds(self)
             self.disconnect()
-    
+
     def _create_device(self):
         self._device = DeviceComponent(
             name=u'Device', is_enabled=False,
@@ -319,10 +318,10 @@ class mMiniLabMk2(ArturiaControlSurface):
             # on_off_button=self._knob8_button),
             device_selection_follows_track_selection=True
         )
-        
+
         self.set_device_component(self._device)
         self._device.set_on_off_button(None)
-        
+
     def _create_transport(self):
         self._transport = TransportComponent(
             name=u'Transport', is_enabled=False,
@@ -335,8 +334,7 @@ class mMiniLabMk2(ArturiaControlSurface):
         self._live = Live.Application.get_application()
         self.app_instance = self._live.view
         self.song_instance = self._transport.song()
-        
-    
+
     def _create_session(self):
         self._session = self.session_component_type(
             num_tracks=self._pads.width(), num_scenes=1,
@@ -348,9 +346,9 @@ class mMiniLabMk2(ArturiaControlSurface):
         )
         self.set_highlighting_session_component(self._session)
         self._session.set_clip_slot_leds(self._pad_leds)
-    
+
     def _create_mixer(self):
-        
+
         self._mixer = MixerComponent(
             name=u'Mixer', is_enabled=False, num_returns=4,
             layer=Layer(
@@ -360,42 +358,41 @@ class mMiniLabMk2(ArturiaControlSurface):
                 selected_track_send_controls=self._send_encoders
             )
         )
-        # self._mixer.set_selected_track_arm_control(self._knob8_button)
         self._mixer.set_selected_track_arm_control(None)
-        
+
         if TWO_SENDS:
             self._mixer.set_return_volume_controls(self._return_encoders)
-    
+
     def _collect_setup_messages(self):
         for cc_id, encoder_id in izip(self.encoder_msg_ids, HARDWARE_ENCODER_IDS):
             # logger.info("encoder - cc_id :: " + str(cc_id) + " id :: " + str(encoder_id) + " channel :: " + str(self.encoder_msg_channel))
             self._setup_hardware_encoder(encoder_id, cc_id, channel=self.encoder_msg_channel)
-        
+
         for index, pad_id in enumerate(HARDWARE_BUTTON_IDS):
             # logger.info("index ::::::::::::::: " + str(index))
             # logger.info("pad_id ::::::::::::::: " + str(pad_id))
             # logger.info("pad_channel ::::::::::::::: " + str(self.pad_channel))
             self._setup_hardware_button(pad_id, index + PAD_IDENTIFIER_OFFSET, self.pad_channel)
-        
+
         self._messages_to_send.append(
             SETUP_MSG_PREFIX + (STORE_IN_MEMORY_COMMAND, LIVE_MEMORY_SLOT_ID) + SETUP_MSG_SUFFIX
         )
         self._messages_to_send.append(
             SETUP_MSG_PREFIX + (LOAD_MEMORY_COMMAND, ANALOG_LAB_MEMORY_SLOT_ID) + SETUP_MSG_SUFFIX
         )
-    
+
     def _setup_hardware(self):
         def send_subsequence(subseq):
             for msg in subseq:
                 self._send_midi(msg)
-        
+
         sequence_to_run = [Task.run(partial(send_subsequence, subsequence)) for subsequence in
                            split_list(self._messages_to_send, 20)]
         self._tasks.add(Task.sequence(*sequence_to_run))
         self._messages_to_send = []
-    
+
     # endregion
-    
+
     def _setup_control_listeners(self):
         if not self._pads2[8].value_has_listener(self._pads2_n8):
             self._pads2[8].add_value_listener(self._pads2_n8, identify_sender=False)
@@ -413,7 +410,7 @@ class mMiniLabMk2(ArturiaControlSurface):
             self._pads2[14].add_value_listener(self._pads2_n14, identify_sender=False)
         if not self._pads2[15].value_has_listener(self._pads2_n15):
             self._pads2[15].add_value_listener(self._pads2_n15, identify_sender=False)
-    
+
         # * _pads1
         if not self._pads[0].value_has_listener(self._pads_n0):
             self._pads[0].add_value_listener(self._pads_n0, identify_sender=False)
@@ -431,7 +428,7 @@ class mMiniLabMk2(ArturiaControlSurface):
             self._pads[6].add_value_listener(self._pads_n6, identify_sender=False)
         if not self._pads[7].value_has_listener(self._pads_n7):
             self._pads[7].add_value_listener(self._pads_n7, identify_sender=False)
-        
+
             # encoders listener
         if not self._knob6_encoder.value_has_listener(self._encoder_n5):
             self._knob6_encoder.add_value_listener(self._encoder_n5, identify_sender=False)
@@ -445,21 +442,21 @@ class mMiniLabMk2(ArturiaControlSurface):
             self._pan_encoder.add_value_listener(self._encoder_n7, identify_sender=False)
         if not self._volume_encoder.value_has_listener(self._encoder_n15):
             self._volume_encoder.add_value_listener(self._encoder_n15, identify_sender=False)
-    
+
         # _knob0_encoder
         if not self._knob0_encoder.value_has_listener(self._encoder_n0):
             self._knob0_encoder.add_value_listener(self._encoder_n0, identify_sender=False)
         if not self._knob0_button.value_has_listener(self._encoder_n0_button):
             self._knob0_button.add_value_listener(self._encoder_n0_button, identify_sender=False)
-    
+
         if not self._knob8_encoder.value_has_listener(self._encoder_n8):
             self._knob8_encoder.add_value_listener(self._encoder_n8, identify_sender=False)
         if not self._knob8_button.value_has_listener(self._encoder_n8_button):
             self._knob8_button.add_value_listener(self._encoder_n8_button, identify_sender=False)
-    
+
         if not self._switchpad_button.value_has_listener(self._switchpad_value_on_press):
             self._switchpad_button.add_value_listener(self._switchpad_value_on_press, identify_sender=False)
-    
+
         if not self._shift_button.value_has_listener(self._shift_value_on_press):
             self._shift_button.add_value_listener(self._shift_value_on_press, identify_sender=False)
 
@@ -482,7 +479,7 @@ class mMiniLabMk2(ArturiaControlSurface):
             self._pads2[14].remove_value_listener(self._pads2_n14)
         if self._pads2[15].value_has_listener(self._pads2_n15):
             self._pads2[15].remove_value_listener(self._pads2_n15)
-        
+
         if self._pads[0].value_has_listener(self._pads_n0):
             self._pads[0].remove_value_listener(self._pads_n0)
         if self._pads[1].value_has_listener(self._pads_n1):
@@ -499,7 +496,7 @@ class mMiniLabMk2(ArturiaControlSurface):
             self._pads[6].remove_value_listener(self._pads_n6)
         if self._pads[7].value_has_listener(self._pads_n7):
             self._pads[7].remove_value_listener(self._pads_n7)
-        
+
         # encoders
         if self._knob6_encoder.value_has_listener(self._encoder_n5):
             self._knob6_encoder.remove_value_listener(self._encoder_n5)
@@ -513,27 +510,27 @@ class mMiniLabMk2(ArturiaControlSurface):
             self._pan_encoder.remove_value_listener(self._encoder_n7)
         if self._volume_encoder.value_has_listener(self._encoder_n15):
             self._volume_encoder.remove_value_listener(self._encoder_n15)
-        
+
         if self._knob0_encoder.value_has_listener(self._encoder_n0):
             self._knob0_encoder.remove_value_listener(self._encoder_n0)
         if self._knob0_button.value_has_listener(self._encoder_n0_button):
             self._knob0_button.remove_value_listener(self._encoder_n0_button)
-        
+
         if self._knob8_encoder.value_has_listener(self._encoder_n8):
             self._knob8_encoder.remove_value_listener(self._encoder_n8)
         if self._knob8_button.value_has_listener(self._encoder_n8_button):
             self._knob8_button.remove_value_listener(self._encoder_n8_button)
-        
+
         if self._switchpad_button.value_has_listener(self._switchpad_value_on_press):
             self._switchpad_button.remove_value_listener(self._switchpad_value_on_press)
-        
+
         if self._shift_button.value_has_listener(self._shift_value_on_press):
             self._shift_button.remove_value_listener(self._shift_value_on_press)
-        
+
         self.shift_active = False
         self.altpad_pushed = False
         self.modo_clip_activo = False
-        
+
         logger.info(" MMINILABMK2 log CLOSE ")
         return None
 
@@ -541,7 +538,7 @@ class mMiniLabMk2(ArturiaControlSurface):
     def _shift_value_on_press(self, value):
         self._update_leds()
         logger.info("mMiniLabMk2 = SHIFT BUTTON PRESSED")
-        
+
         if value[0] > 0:
             self.modo_clip_activo = False
             self.shift_active = True
@@ -557,7 +554,7 @@ class mMiniLabMk2(ArturiaControlSurface):
             self._transport.set_overdub_button(self._pads2[10])
             self.show_message("SHIFT inactivo")
         self._update_leds()
-    
+
     # * no implementado
     def _switchpad_value_on_press(self, value):
         if value[0] > 0:
@@ -567,21 +564,21 @@ class mMiniLabMk2(ArturiaControlSurface):
         else:
             self.altpad_pushed = False
             self._update_leds()
-    
+
     def _alt_encoder_n0(self, value):
         if value > 0:
             logger.info("::::::::::::_alt_encoder_n0 ::::::::::::: " + str(value))
-    
+
     def _alt_encoder_n8(self, value):
         if value > 0:
             logger.info("::::::::::::_alt_encoder_n8 ::::::::::::: " + str(value))
-    
+
     # * Knob 1 (0), sin shift pulsado cambia entre tracks,
     # * con shift cambia entre devices
     def _encoder_n0(self, value):
         # * shift, device change
         if self.modo_clip_activo:
-            
+
             if value > 0:
                 if self.application().view.is_view_visible(u'Detail/Clip'):
                     # * shift, track change when in clip view
@@ -589,7 +586,7 @@ class mMiniLabMk2(ArturiaControlSurface):
                     if clip:
                         clip.view.show_loop()
                     # self._mixer.set_track_select_encoder(self._knob0_encoder)
-                
+
                 elif self.application().view.is_view_visible(u'Detail/DeviceChain'):
                     # self._mixer.set_track_select_encoder(None)
                     pass
@@ -597,13 +594,14 @@ class mMiniLabMk2(ArturiaControlSurface):
         # * normal, track change
         else:
             self._mixer.set_track_select_encoder(self._knob0_encoder)
-    
+
     # * Boton de knob 1 (0), Cambia  de vista entre clip y device tambien hace zoom al loop del clip,
     # *  con shift pulsado oculta la vista de detalle
     def _encoder_n0_button(self, value):
+
         if value > 0:
             self.enc0_button = True
-            
+
             self._session.set_enabled(False)
             # self._session.clip_launch_buttons(False)
             session_tracks = self._session.current_tracks
@@ -618,7 +616,7 @@ class mMiniLabMk2(ArturiaControlSurface):
                 pad_track = total_v_tracks[track_number]
                 if pad_track.mute:
                     _send_color(self, 112 + pad_number, CYAN)
-            
+
             # * shift, hide / show detail
             if self.shift_active:
                 # * shift, hide / show detail
@@ -626,8 +624,8 @@ class mMiniLabMk2(ArturiaControlSurface):
                 # * Fold / unfold track in session
                 is_folder = self.Actions.button_track_fold()
                 if not is_folder:
-            # * Modo Clip y Normal, change view (device - clip)
-            # else:
+                    # * Modo Clip y Normal, change view (device - clip)
+                    # else:
                     # * Detail
                     if not self.application().view.is_view_visible(u'Detail'):
                         self.application().view.focus_view("Detail")
@@ -640,22 +638,23 @@ class mMiniLabMk2(ArturiaControlSurface):
         else:
             self.enc0_button = False
             self._session.set_enabled(True)
-    
+
     # * no implementado
     def _encoder_n8(self, value):
         # * detectar Movimiento Vertical
         # scene_selected = self.song_instance.view.selected_scene
         if value > 0:
             self._update_leds()
-    
+
     # *Boton de knob 9(8), mantenerlo pulsado permite armar el track para grabacion
     # * con shift entra en Modo Clip
     # * si ya esta el Modo Clip en Detail/Clip hace zoom al clip
     # *                         en Detail/DeviceChain activa el device
     def _encoder_n8_button(self, value):
+
         if value > 0:
             self.enc8_button = True
-            
+
             self._session.set_enabled(False)
             session_tracks = self._session.current_tracks
             visible_session_pads_number = len(session_tracks)
@@ -674,15 +673,14 @@ class mMiniLabMk2(ArturiaControlSurface):
                     logger.info(" : Error : " + str(pad_track.name))
                     logger.info(" : Error : " + str(e))
                     continue
-            
-            
+
             # * shift, enter Modo Clip
             if self.shift_active:
-                self.show_message("Modo Clip activo")
+                self.show_message("Clip mode active")
                 self.modo_clip_activo = True
                 _shift_led(self, True)
                 self._device.set_on_off_button(None)
-                
+
                 # ! !!!
                 self.Actions.focus_onplaying_clip()
 
@@ -693,7 +691,7 @@ class mMiniLabMk2(ArturiaControlSurface):
                     self._device.set_on_off_button(None)
                     # * Focus on clip loop
                     self.Actions.button_focus_cliploop()
-                
+
                 elif self.application().view.is_view_visible(u'Detail/DeviceChain'):
                     self._device.set_on_off_button(self._knob8_button)
                     # * Detail/DeviceChain, activate device
@@ -703,8 +701,6 @@ class mMiniLabMk2(ArturiaControlSurface):
             self.enc8_button = False
             self._session.set_enabled(True)
 
-    
-
     # * vol send a / set start marker, select device preset/ simpler
     def _encoder_n5(self, value):
         if self.shift_active or self.modo_clip_activo:
@@ -712,17 +708,17 @@ class mMiniLabMk2(ArturiaControlSurface):
                 self._mixer.set_return_volume_controls(None)
             else:
                 self._mixer.set_selected_track_send_controls(None)
-            
+
             # * shift
             if self.application().view.is_view_visible(u'Detail/Clip'):
                 if value > 0:
                     # * shift, set start marker
                     self.Actions.enc_set_start_marker(value)
-            
+
             elif self.application().view.is_view_visible(u'Detail/DeviceChain'):
                 self.application().view.focus_view("Detail/DeviceChain")
                 if value > 0:
-                    
+
                     # * shift,
                     dev = self.song_instance.appointed_device
                     if dev:
@@ -742,7 +738,7 @@ class mMiniLabMk2(ArturiaControlSurface):
                 self._mixer.set_return_volume_controls(self._return_encoders)
             else:
                 self._mixer.set_selected_track_send_controls(self._send_encoders)
-    
+
     # * send a / move loop
     def _encoder_n6(self, value):
         # * shift,
@@ -777,7 +773,7 @@ class mMiniLabMk2(ArturiaControlSurface):
         # * normal, track pannig
         else:
             self._mixer.set_selected_track_pan_control(self._pan_encoder)
-    
+
     # * vol send b / change indevice
     def _encoder_n13(self, value):
         # * shift,
@@ -797,7 +793,7 @@ class mMiniLabMk2(ArturiaControlSurface):
                     if track.view.selected_device_has_listener(self._device_changed):
                         track.view.remove_selected_device_listener(self._device_changed)
                     self.Actions.enc_moveinto_devices(value, self.__selecteddevice, self.__sub_devices)
-        
+
         # * normal, volumen de send b
         else:
             if TWO_SENDS:
@@ -833,12 +829,12 @@ class mMiniLabMk2(ArturiaControlSurface):
                 if self.application().view.is_view_visible(u'Detail/Clip'):
                     # * shift, track volumen
                     self._mixer.set_selected_track_volume_control(self._volume_encoder)
-                    
+
                     # self.Actions.enc_set_end_marker(value)
                 if self.application().view.is_view_visible(u'Detail/DeviceChain'):
                     # * shift, track volumen
                     self._mixer.set_selected_track_volume_control(self._volume_encoder)
-        
+
         # * normal, track volumen
         else:
             self._mixer.set_selected_track_volume_control(self._volume_encoder)
@@ -858,7 +854,7 @@ class mMiniLabMk2(ArturiaControlSurface):
                     sub_list.append(dev)
         self.__sub_devices = sub_list
         self.__selecteddevice = device
-    
+
     # ? PADS 1
     def get_session_track(self, pad_id):
         total_v_tracks = self.song_instance.visible_tracks
@@ -956,7 +952,7 @@ class mMiniLabMk2(ArturiaControlSurface):
                 # * normal, play pause button
                 self.Actions.button_playpause()
         self._update_leds()
-    
+
     # * n121 - stop / undo
     def _pads2_n9(self, value):
         # * shift, undo
@@ -971,7 +967,7 @@ class mMiniLabMk2(ArturiaControlSurface):
                 if self.song_instance.is_playing:
                     self.song_instance.stop_playing()
         self._update_leds()
-    
+
     # TODO: Usar un pad para guardar el estado del loop y recuperarlo despues
     # * n122 - overdub / nope
     def _pads2_n10(self, value):
@@ -980,14 +976,14 @@ class mMiniLabMk2(ArturiaControlSurface):
             self._transport.set_overdub_button(None)
             if value > 0:
                 return
-        
+
         else:
             self._transport.set_overdub_button(self._pads2[10])
             if value > 0:
                 # * normal, overdub
                 self.Actions.button_overdub()
         self._update_leds()
-    
+
     # * n123 - undo / none
     def _pads2_n11(self, value):
         if self.shift_active or self.modo_clip_activo:
@@ -998,7 +994,7 @@ class mMiniLabMk2(ArturiaControlSurface):
                 # * normal, undo
                 self.song_instance.undo()
         self._update_leds()
-    
+
     # * n124 - alternate_view detail
     def _pads2_n12(self, value):
         # * shift, alternate_view detail
@@ -1011,10 +1007,10 @@ class mMiniLabMk2(ArturiaControlSurface):
             if value > 0:
                 self.Actions.button_alternate_viewdetail()
         self._update_leds()
-    
+
     # *n125 - nope /  quantize
     def _pads2_n13(self, value):
-        
+
         if self.shift_active or self.modo_clip_activo:
             self._transport.set_stop_button(None)
             if self.application().view.is_view_visible(u'Detail/Clip'):
@@ -1025,7 +1021,7 @@ class mMiniLabMk2(ArturiaControlSurface):
         else:
             self._update_leds()
         self._update_leds()
-    
+
     # *n126 - new scene / scrub
     def _pads2_n14(self, value):
         if self.shift_active or self.modo_clip_activo:
@@ -1048,10 +1044,10 @@ class mMiniLabMk2(ArturiaControlSurface):
                 # * normal, new scene from play
                 self.Actions.button_newscene_fplay()
         self._update_leds()
-    
+
     # * n127 - play stop scene / play stop clip
     def _pads2_n15(self, value):
-        
+
         if self.shift_active or self.modo_clip_activo:
             if self.application().view.is_view_visible(u'Detail/Clip'):
                 # * shift, play stop clip
@@ -1063,13 +1059,13 @@ class mMiniLabMk2(ArturiaControlSurface):
             else:
                 self.Actions.button_play_scene(value)
         self._update_leds()
-    
+
     def clip_properties(self, clip):
         if clip.is_audio_clip:
             CLIP_TYPE = "Audio clip"
         else:
             CLIP_TYPE = "Midi clip"
-        
+
         logger.info(CLIP_TYPE + " - start_time : " + str(clip.start_time))
         logger.info(CLIP_TYPE + " - end_time : " + str(clip.end_time))
         logger.info(CLIP_TYPE + " - start_marker : " + str(clip.start_marker))
@@ -1090,7 +1086,7 @@ class mMiniLabMk2(ArturiaControlSurface):
             else:
                 time = clip.seconds_to_sample_time(clip.length)
                 logger.info(CLIP_TYPE + " - SECONDS to Sample TIME : " + str(time) + " (sample time)")
-    
+
     def device_properties(self, device):
         logger.info("device PROPERTIES ::::::::::::: ")
         dtype = device.type
@@ -1147,11 +1143,10 @@ class mMiniLabMk2(ArturiaControlSurface):
             logger.info("device bank_count :: " + str(bank_count))
         except AttributeError as e:
             logger.info("device bank_count :: " + str(e))
-    
+
     # ? Leds stuff
     def _update_leds(self):
         if self.shift_active or self.modo_clip_activo:
             _leds_ClipMode(self, self.song_instance)
         else:
             _leds_NormalMode(self, self.song_instance)
-    

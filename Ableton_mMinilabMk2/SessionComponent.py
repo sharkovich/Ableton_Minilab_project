@@ -18,20 +18,20 @@ logger = logging.getLogger(__name__)
 
 
 class ClipSlotComponent(ClipSlotComponentBase):
-    
+
     def __init__(self, *a, **k):
         super(ClipSlotComponent, self).__init__(*a, **k)
         self._led = None
         self.transport = None
         self._mute_button_value = None
-    
+
     def set_led(self, led):
         self._led = led
-    
+
     def update(self):
         super(ClipSlotComponent, self).update()
         self._update_led()
-    
+
     def _update_led(self):
         if self.is_enabled() and self._led != None:
             value_to_send = EMPTY_VALUE
@@ -43,12 +43,11 @@ class ClipSlotComponent(ClipSlotComponentBase):
                     
             self._led.send_value((value_to_send,))
 
-    
     def x_led_feedback_value(self, track, clip_slot):
-        
+
         muted = False
         if track.mute:
-             muted = True
+            muted = True
         if clip_slot.controls_other_clips:
             if clip_slot.is_playing:
                 if muted:
@@ -136,16 +135,16 @@ class SessionComponent(SessionComponentBase):
     scene_select_encoder = EncoderControl()
     scene_component_type = SceneComponent
     _session_component_ends_initialisation = False
-    
+
     def __init__(self, *a, **k):
         super(SessionComponent, self).__init__(*a, **k)
         self.set_offsets(0, 0)
         self.on_selected_scene_changed()
         self.on_selected_track_changed()
-    
+
     def set_scene_select_control(self, control):
         self.scene_select_encoder.set_control_element(control)
-    
+
     @scene_select_encoder.value
     def scene_select_encoder(self, value, encoder):
         selected_scene = self.song().view.selected_scene
@@ -155,14 +154,14 @@ class SessionComponent(SessionComponentBase):
             self.song().view.selected_scene = all_scenes[current_index + 1]
         elif value < 0 and selected_scene != all_scenes[0]:
             self.song().view.selected_scene = all_scenes[current_index - 1]
-    
+
     def on_selected_scene_changed(self):
         super(SessionComponent, self).on_selected_scene_changed()
         all_scenes = list(self.song().scenes)
         selected_scene = self.song().view.selected_scene
         new_scene_offset = all_scenes.index(selected_scene)
         self.set_offsets(self.track_offset(), new_scene_offset)
-    
+
     def on_selected_track_changed(self):
         super(SessionComponent, self).on_selected_track_changed()
         # * Arturia default
@@ -175,10 +174,9 @@ class SessionComponent(SessionComponentBase):
             new_track_offset = track_index - track_index % self.width()
             self.set_offsets(new_track_offset, self.scene_offset())
 
-
     def set_clip_slot_leds(self, leds):
         assert not leds or leds.width() == self._num_tracks and leds.height() == 1
-        # assert not leds or leds.width() == self._num_tracks
+
         logger.info("session pad offset ::: " + str(self._num_tracks))
         if leds:
             for led, (x, y) in leds.iterbuttons():
@@ -190,4 +188,3 @@ class SessionComponent(SessionComponentBase):
                 scene = self.scene(y)
                 slot = scene.clip_slot(x)
                 slot.set_led(None)
-
