@@ -38,9 +38,9 @@ class ClipSlotComponent(ClipSlotComponentBase):
             if liveobj_valid(self._clip_slot):
                 track = self._clip_slot.canonical_parent
                 slot_or_clip = self._clip_slot.clip if self.has_clip() else self._clip_slot
-                # value_to_send = self._led_feedback_value(track, slot_or_clip)
-                value_to_send = self.x_led_feedback_value(track, self._clip_slot)
-                    
+                value_to_send = self._led_feedback_value(track, slot_or_clip)
+                # value_to_send = self.x_led_feedback_value(track, self._clip_slot)
+
             self._led.send_value((value_to_send,))
 
     def x_led_feedback_value(self, track, clip_slot):
@@ -82,16 +82,14 @@ class ClipSlotComponent(ClipSlotComponentBase):
                 #     return TRACK_ARMED_VALUE
                 return STOPPED_VALUE
         else:
-            
             if muted:
                 if self._track_is_armed(track):
                     return TRACK_ARMED_VALUE
                 return TRACK_ARMED_MUTED_VALUE
             if muted:
                 return TRACK_MUTED_VALUE
-            return SELECTED_VALUE
-    
-    
+            return EMPTY_VALUE
+
     def _led_feedback_value(self, track, slot_or_clip):
         try:
             if slot_or_clip.controls_other_clips:
@@ -124,7 +122,7 @@ class ClipSlotComponent(ClipSlotComponentBase):
                 return TRACK_ARMED_VALUE
             if track.mute is True:
                 return TRACK_MUTED_VALUE
-            return SELECTED_VALUE
+            return EMPTY_VALUE
 
 
 class SceneComponent(SceneComponentBase):
